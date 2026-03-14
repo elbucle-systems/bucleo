@@ -1,0 +1,24 @@
+{
+  "name": "bucleo-api",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [],
+  "author": "Iván Pérez",
+  "license": "Apache-2.0",
+  "type": "module",
+  "description": "Api for Bucleo, a Learning System based on The Bloom's Taxonomy",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.5.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
