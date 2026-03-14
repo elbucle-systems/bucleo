@@ -13,6 +13,8 @@
   "type": "module",
   "description": "Api for Bucleo, a Learning System based on The Bloom's Taxonomy",
   "dependencies": {
+    "@openrouter/sdk": "^0.9.11",
+    "dotenv": "^17.3.1",
     "express": "^5.2.1"
   },
   "devDependencies": {
