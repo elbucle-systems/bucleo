@@ -1,150 +1,290 @@
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { Link, useParams } from "react-router"
-import { ArrowLeft, ChevronDown, ChevronUp, Layers } from "lucide-react"
+import {
+  ArrowLeft,
+  BookText,
+  Network,
+  Wrench,
+  Brain,
+  ChevronDown,
+  ChevronUp,
+  Lightbulb,
+  Tag,
+  ArrowRight,
+  GraduationCap,
+  Star,
+  BookOpen,
+} from "lucide-react"
 import type {
   KnowledgeDimensionKey,
-  KnowledgeSubtypeDetail,
+  KnowledgeSubtypeFlat,
 } from "../../types/taxonomy"
-import { getKnowledgeDimensions } from "../../lib/api/knowledgeDimensions"
+import {
+  getKnowledgeDimensions,
+  getKnowledgeDimensionSubtypes,
+} from "../../lib/api/knowledgeDimensions"
 
-const DIMENSION_STYLE: Record<
+const DIMENSION_CONFIG: Record<
   KnowledgeDimensionKey,
-  { badge: string; ring: string; subtypeBg: string }
+  {
+    Icon: React.ElementType
+    headerBg: string
+    headerIconBg: string
+    headerIconText: string
+    headerBadge: string
+    headerTitle: string
+    border: string
+    ring: string
+    subtypeBorder: string
+    subtypeBg: string
+    subtypeIconBg: string
+    subtypeIconText: string
+    sectionBg: string
+    charCardBg: string
+  }
 > = {
   factual: {
-    badge: "bg-slate-100 text-slate-700",
-    ring: "ring-slate-300",
+    Icon: BookText,
+    headerBg: "bg-slate-100",
+    headerIconBg: "bg-slate-200",
+    headerIconText: "text-slate-600",
+    headerBadge: "bg-slate-200 text-slate-600",
+    headerTitle: "text-slate-900",
+    border: "border-slate-200",
+    ring: "ring-slate-200",
+    subtypeBorder: "border-l-slate-400",
     subtypeBg: "bg-slate-50",
+    subtypeIconBg: "bg-slate-200",
+    subtypeIconText: "text-slate-600",
+    sectionBg: "bg-slate-50/60",
+    charCardBg: "bg-slate-50",
   },
   conceptual: {
-    badge: "bg-indigo-50 text-indigo-700",
-    ring: "ring-indigo-300",
-    subtypeBg: "bg-indigo-50/40",
+    Icon: Network,
+    headerBg: "bg-indigo-50",
+    headerIconBg: "bg-indigo-100",
+    headerIconText: "text-indigo-600",
+    headerBadge: "bg-indigo-100 text-indigo-600",
+    headerTitle: "text-indigo-950",
+    border: "border-indigo-100",
+    ring: "ring-indigo-200",
+    subtypeBorder: "border-l-indigo-400",
+    subtypeBg: "bg-indigo-50",
+    subtypeIconBg: "bg-indigo-100",
+    subtypeIconText: "text-indigo-600",
+    sectionBg: "bg-indigo-50/40",
+    charCardBg: "bg-indigo-50/60",
   },
   procedural: {
-    badge: "bg-teal-50 text-teal-700",
-    ring: "ring-teal-300",
-    subtypeBg: "bg-teal-50/40",
+    Icon: Wrench,
+    headerBg: "bg-teal-50",
+    headerIconBg: "bg-teal-100",
+    headerIconText: "text-teal-600",
+    headerBadge: "bg-teal-100 text-teal-600",
+    headerTitle: "text-teal-950",
+    border: "border-teal-100",
+    ring: "ring-teal-200",
+    subtypeBorder: "border-l-teal-400",
+    subtypeBg: "bg-teal-50",
+    subtypeIconBg: "bg-teal-100",
+    subtypeIconText: "text-teal-600",
+    sectionBg: "bg-teal-50/40",
+    charCardBg: "bg-teal-50/60",
   },
   metacognitive: {
-    badge: "bg-violet-50 text-violet-700",
-    ring: "ring-violet-300",
-    subtypeBg: "bg-violet-50/40",
+    Icon: Brain,
+    headerBg: "bg-violet-50",
+    headerIconBg: "bg-violet-100",
+    headerIconText: "text-violet-600",
+    headerBadge: "bg-violet-100 text-violet-600",
+    headerTitle: "text-violet-950",
+    border: "border-violet-100",
+    ring: "ring-violet-200",
+    subtypeBorder: "border-l-violet-400",
+    subtypeBg: "bg-violet-50",
+    subtypeIconBg: "bg-violet-100",
+    subtypeIconText: "text-violet-600",
+    sectionBg: "bg-violet-50/40",
+    charCardBg: "bg-violet-50/60",
   },
 }
 
 function SubtypeAccordion({
   subtype,
-  style,
+  cfg,
 }: {
-  subtypeKey: string
-  subtype: KnowledgeSubtypeDetail
-  style: (typeof DIMENSION_STYLE)[KnowledgeDimensionKey]
+  subtype: KnowledgeSubtypeFlat
+  cfg: (typeof DIMENSION_CONFIG)[KnowledgeDimensionKey]
 }) {
   const [open, setOpen] = useState(false)
+  const label = subtype.name
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (c) => c.toUpperCase())
 
   return (
-    <li className="overflow-hidden rounded-lg border border-stone-200 bg-white">
+    <li
+      className={`overflow-hidden rounded-2xl border-l-4 ${cfg.subtypeBorder} border border-stone-200 bg-white shadow-sm`}
+    >
+      {/* Accordion trigger */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-stone-50"
+        className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:brightness-95 ${open ? cfg.subtypeBg : "bg-white"}`}
         aria-expanded={open}
       >
-        <div>
-          <p className="text-sm font-semibold text-stone-800">
-            {subtype.name
-              .replace(/([A-Z])/g, " $1")
-              .replace(/^./, (c) => c.toUpperCase())}
-          </p>
-          <p className="mt-0.5 text-xs text-stone-500">{subtype.definition}</p>
+        <div className="flex items-center gap-3">
+          <span
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${cfg.subtypeIconBg}`}
+          >
+            <Lightbulb
+              size={14}
+              strokeWidth={1.8}
+              className={cfg.subtypeIconText}
+              aria-hidden
+            />
+          </span>
+          <div>
+            <p className="text-base font-bold text-stone-900">{label}</p>
+            <p className="mt-0.5 line-clamp-1 text-sm text-stone-500">
+              {subtype.definition}
+            </p>
+          </div>
         </div>
-        <span className="shrink-0 text-stone-400">
-          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        <span className={`shrink-0 ${cfg.subtypeIconText}`}>
+          {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
         </span>
       </button>
 
       {open && (
-        <div
-          className={`space-y-4 border-t border-stone-100 px-4 py-4 ${style.subtypeBg}`}
-        >
+        <div className={`divide-y divide-stone-100 ${cfg.sectionBg}`}>
           {/* Content */}
-          <section>
-            <h5 className="mb-2 text-xs font-semibold tracking-wider text-stone-400 uppercase">
-              Content
-            </h5>
-            <dl className="space-y-1.5">
-              <div>
-                <dt className="text-xs font-medium text-stone-500">Includes</dt>
-                <dd className="text-sm text-stone-700">
-                  {subtype.content.includes}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs font-medium text-stone-500">Basis</dt>
-                <dd className="text-sm text-stone-700">
-                  {subtype.content.basis}
-                </dd>
-              </div>
-              {subtype.content.precision && (
-                <div>
-                  <dt className="text-xs font-medium text-stone-500">
-                    Precision
-                  </dt>
-                  <dd className="text-sm text-stone-700">
-                    {subtype.content.precision}
-                  </dd>
-                </div>
-              )}
-            </dl>
-          </section>
-
-          {/* Characteristics */}
-          <section>
-            <h5 className="mb-2 text-xs font-semibold tracking-wider text-stone-400 uppercase">
-              Characteristics
+          <section className="px-5 py-5">
+            <h5 className="mb-3 flex items-center gap-2 text-xs font-bold tracking-widest text-stone-400 uppercase">
+              <BookOpen size={11} aria-hidden /> Content
             </h5>
             <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              {Object.entries(subtype.characteristics).map(([k, v]) => (
-                <div key={k}>
-                  <dt className="text-xs font-medium text-stone-500 capitalize">
-                    {k.replace(/([A-Z])/g, " $1")}
+              {[
+                { label: "Includes", value: subtype.content.includes },
+                { label: "Basis", value: subtype.content.basis },
+                ...(subtype.content.precision
+                  ? [{ label: "Precision", value: subtype.content.precision }]
+                  : []),
+              ].map(({ label: l, value }) => (
+                <div
+                  key={l}
+                  className={`rounded-xl border border-stone-200 bg-white px-4 py-3`}
+                >
+                  <dt className="mb-1 text-xs font-bold tracking-wider text-stone-400 uppercase">
+                    {l}
                   </dt>
-                  <dd className="text-sm text-stone-700">{v}</dd>
+                  <dd className="text-sm leading-relaxed text-stone-700">
+                    {value}
+                  </dd>
                 </div>
               ))}
             </dl>
           </section>
 
-          <section>
-            <h5 className="mb-1 text-xs font-semibold tracking-wider text-stone-400 uppercase">
-              Distinguished from
+          {/* Characteristics */}
+          <section className="px-5 py-5">
+            <h5 className="mb-3 flex items-center gap-2 text-xs font-bold tracking-widest text-stone-400 uppercase">
+              <Tag size={11} aria-hidden /> Characteristics
             </h5>
-            <p className="text-sm text-stone-700">
-              <span className="font-medium">
-                {subtype.distinguishedFrom.target}
-              </span>{" "}
-              — {subtype.distinguishedFrom.basis}
-            </p>
+            <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {Object.entries(subtype.characteristics).map(([k, v]) => (
+                <div
+                  key={k}
+                  className="rounded-xl border border-stone-200 bg-white px-4 py-3"
+                >
+                  <dt className="mb-1 text-xs font-bold tracking-wider text-stone-400 uppercase">
+                    {k.replace(/([A-Z])/g, " $1")}
+                  </dt>
+                  <dd className="text-sm leading-relaxed text-stone-700">
+                    {v}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </section>
 
-          <section>
-            <h5 className="mb-1 text-xs font-semibold tracking-wider text-stone-400 uppercase">
-              Learning implications
-            </h5>
-            <p className="text-sm text-stone-700">
-              {subtype.learningImplications}
-            </p>
+          {/* Distinguished from + Builds upon */}
+          <section className="grid grid-cols-1 gap-4 px-5 py-5 sm:grid-cols-2">
+            <div className="rounded-xl border border-stone-200 bg-white px-4 py-3">
+              <h5 className="mb-1 flex items-center gap-1.5 text-xs font-bold tracking-widest text-stone-400 uppercase">
+                <ArrowRight size={11} aria-hidden /> Distinguished from
+              </h5>
+              <p className="text-sm leading-relaxed text-stone-700">
+                <span className="font-semibold">
+                  {subtype.distinguishedFrom.target}
+                </span>
+                {" — "}
+                {subtype.distinguishedFrom.basis}
+              </p>
+            </div>
+            <div className="rounded-xl border border-stone-200 bg-white px-4 py-3">
+              <h5 className="mb-1 flex items-center gap-1.5 text-xs font-bold tracking-widest text-stone-400 uppercase">
+                <ArrowLeft size={11} aria-hidden /> Builds upon
+              </h5>
+              <p className="text-sm leading-relaxed text-stone-700">
+                {subtype.buildsUpon}
+              </p>
+            </div>
           </section>
 
-          <section>
-            <h5 className="mb-1 text-xs font-semibold tracking-wider text-stone-400 uppercase">
-              Expertise indicators
-            </h5>
-            <p className="text-sm text-stone-700">
-              {subtype.expertiseIndicators}
-            </p>
+          {/* Learning implications + Expertise indicators */}
+          <section className="grid grid-cols-1 gap-4 px-5 py-5 sm:grid-cols-2">
+            <div className="rounded-xl border border-stone-200 bg-white px-4 py-3">
+              <h5 className="mb-1 flex items-center gap-1.5 text-xs font-bold tracking-widest text-stone-400 uppercase">
+                <GraduationCap size={11} aria-hidden /> Learning implications
+              </h5>
+              <p className="text-sm leading-relaxed text-stone-700">
+                {subtype.learningImplications}
+              </p>
+            </div>
+            <div className="rounded-xl border border-stone-200 bg-white px-4 py-3">
+              <h5 className="mb-1 flex items-center gap-1.5 text-xs font-bold tracking-widest text-stone-400 uppercase">
+                <Star size={11} aria-hidden /> Expertise indicators
+              </h5>
+              <p className="text-sm leading-relaxed text-stone-700">
+                {subtype.expertiseIndicators}
+              </p>
+            </div>
           </section>
+
+          {/* Examples */}
+          {Object.keys(subtype.examples).length > 0 && (
+            <section className="px-5 py-5">
+              <h5 className="mb-3 flex items-center gap-2 text-xs font-bold tracking-widest text-stone-400 uppercase">
+                <Lightbulb size={11} aria-hidden /> Examples
+              </h5>
+              <div className="space-y-4">
+                {Object.entries(subtype.examples).map(([category, items]) => (
+                  <div key={category}>
+                    <p
+                      className={`mb-2 inline-block rounded-full px-3 py-0.5 text-xs font-bold tracking-widest uppercase ${cfg.headerBadge}`}
+                    >
+                      {category.replace(/([A-Z])/g, " $1")}
+                    </p>
+                    <dl className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      {Object.entries(items).map(([term, meaning]) => (
+                        <div
+                          key={term}
+                          className="rounded-lg border border-stone-200 bg-white px-3 py-2"
+                        >
+                          <dt className="text-xs font-bold text-stone-700 capitalize">
+                            {term.replace(/([A-Z])/g, " $1")}
+                          </dt>
+                          <dd className="mt-0.5 text-xs leading-relaxed text-stone-500">
+                            {meaning}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       )}
     </li>
@@ -155,14 +295,21 @@ export default function KnowledgeDimensionDetailPage() {
   const { dimension: paramKey } = useParams<{
     dimension: KnowledgeDimensionKey
   }>()
-  const { data: dimensions, isLoading } = useQuery({
+  const { data: dimensions, isLoading: dimLoading } = useQuery({
     queryKey: ["knowledgeDimensions"],
     queryFn: getKnowledgeDimensions,
   })
+  const { data: subtypes, isLoading: subtypesLoading } = useQuery({
+    queryKey: ["knowledgeDimensionSubtypes", paramKey],
+    queryFn: () => getKnowledgeDimensionSubtypes(paramKey!),
+    enabled: !!paramKey,
+  })
   const dimension = dimensions?.find((d) => d.key === paramKey)
-  const style =
-    DIMENSION_STYLE[paramKey as KnowledgeDimensionKey] ??
-    DIMENSION_STYLE.factual
+  const isLoading = dimLoading || subtypesLoading
+  const cfg =
+    DIMENSION_CONFIG[paramKey as KnowledgeDimensionKey] ??
+    DIMENSION_CONFIG.factual
+  const { Icon } = cfg
 
   if (isLoading) {
     return (
@@ -192,10 +339,8 @@ export default function KnowledgeDimensionDetailPage() {
     )
   }
 
-  const subtypeEntries = Object.entries(dimension.subtypes)
-
   return (
-    <main className="mx-auto max-w-3xl space-y-10 px-4 py-12">
+    <main className="mx-auto max-w-4xl space-y-10 px-4 py-12">
       {/* Back */}
       <Link
         to="/taxonomy/knowledge-dimensions"
@@ -205,36 +350,56 @@ export default function KnowledgeDimensionDetailPage() {
         All knowledge dimensions
       </Link>
 
-      {/* Header */}
-      <section className="space-y-3">
-        <span className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase">
-          <Layers size={14} aria-hidden className="text-stone-400" />
+      {/* Hero header — matches card design */}
+      <section
+        className={`overflow-hidden rounded-2xl border-2 ${cfg.border} bg-white shadow-sm`}
+      >
+        <div
+          className={`flex items-center gap-5 ${cfg.headerBg} border-b border-stone-200 px-7 py-6`}
+        >
           <span
-            className={`rounded-full px-2 py-0.5 text-xs font-semibold ${style.badge}`}
+            className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl ${cfg.headerIconBg}`}
           >
-            {dimension.key}
+            <Icon
+              size={28}
+              strokeWidth={1.5}
+              className={cfg.headerIconText}
+              aria-hidden
+            />
           </span>
-        </span>
-        <h1 className="text-3xl font-bold text-stone-800">
-          {dimension.dimension}
-        </h1>
-        <p className="max-w-2xl text-base leading-relaxed text-stone-500">
-          {dimension.definition}
-        </p>
+          <div>
+            <span
+              className={`mb-1.5 inline-block rounded-full px-3 py-0.5 text-xs font-bold tracking-widest uppercase ${cfg.headerBadge}`}
+            >
+              {dimension.key}
+            </span>
+            <h1 className={`text-2xl font-extrabold ${cfg.headerTitle}`}>
+              {dimension.dimension}
+            </h1>
+          </div>
+        </div>
+        <div className="px-7 py-5">
+          <p className="text-base leading-relaxed text-stone-600">
+            {dimension.definition}
+          </p>
+        </div>
       </section>
 
-      {/* Characteristics table */}
-      <section className={`rounded-xl ring-1 ${style.ring} space-y-1 p-5`}>
-        <h2 className="mb-3 text-xs font-semibold tracking-wider text-stone-400 uppercase">
-          Characteristics
+      {/* Characteristics */}
+      <section>
+        <h2 className="mb-4 flex items-center gap-2 text-sm font-bold tracking-widest text-stone-500 uppercase">
+          <Tag size={13} aria-hidden /> Characteristics
         </h2>
-        <dl className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+        <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {Object.entries(dimension.characteristics).map(([k, v]) => (
-            <div key={k}>
-              <dt className="text-xs font-medium text-stone-500 capitalize">
+            <div
+              key={k}
+              className={`rounded-xl border border-stone-200 ${cfg.charCardBg} px-5 py-4`}
+            >
+              <dt className="mb-1 text-xs font-bold tracking-wider text-stone-400 uppercase">
                 {k.replace(/([A-Z])/g, " $1")}
               </dt>
-              <dd className="text-sm text-stone-700">{v}</dd>
+              <dd className="text-sm leading-relaxed text-stone-700">{v}</dd>
             </div>
           ))}
         </dl>
@@ -242,30 +407,29 @@ export default function KnowledgeDimensionDetailPage() {
 
       {/* Distinguished from */}
       <section>
-        <h2 className="mb-2 text-xs font-semibold tracking-wider text-stone-400 uppercase">
-          Distinguished from
+        <h2 className="mb-3 flex items-center gap-2 text-sm font-bold tracking-widest text-stone-500 uppercase">
+          <ArrowRight size={13} aria-hidden /> Distinguished From
         </h2>
-        <p className="text-sm text-stone-700">
-          <span className="font-medium">
-            {dimension.distinguishedFrom.target}
-          </span>{" "}
-          — {dimension.distinguishedFrom.basis}
-        </p>
+        <div className="rounded-xl border border-stone-200 bg-white px-5 py-4">
+          <p className="text-base leading-relaxed text-stone-700">
+            <span className="font-semibold">
+              {dimension.distinguishedFrom.target}
+            </span>
+            {" — "}
+            {dimension.distinguishedFrom.basis}
+          </p>
+        </div>
       </section>
 
       {/* Subtypes */}
       <section>
-        <h2 className="mb-4 text-sm font-semibold text-stone-700">
-          Subtypes ({subtypeEntries.length})
+        <h2 className="mb-5 flex items-center gap-2 text-sm font-bold tracking-widest text-stone-500 uppercase">
+          <Lightbulb size={13} aria-hidden />
+          Subtypes ({subtypes?.length ?? 0})
         </h2>
-        <ul className="space-y-3">
-          {subtypeEntries.map(([key, subtype]) => (
-            <SubtypeAccordion
-              key={key}
-              subtypeKey={key}
-              subtype={subtype}
-              style={style}
-            />
+        <ul className="space-y-4">
+          {subtypes?.map((subtype) => (
+            <SubtypeAccordion key={subtype.key} subtype={subtype} cfg={cfg} />
           ))}
         </ul>
       </section>

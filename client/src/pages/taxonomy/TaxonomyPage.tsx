@@ -7,13 +7,13 @@ export default function TaxonomyPage() {
     <main className="mx-auto max-w-4xl space-y-16 px-4 py-12">
       {/* Hero */}
       <section className="space-y-4 text-center">
-        <span className="mb-1 inline-block text-xs font-semibold tracking-widest text-indigo-500 uppercase">
+        <span className="mb-1 inline-block text-sm font-bold tracking-widest text-indigo-500 uppercase">
           Reference Guide
         </span>
-        <h1 className="text-4xl leading-tight font-bold text-stone-800">
+        <h1 className="text-5xl leading-tight font-extrabold text-stone-900">
           Bloom's Revised Taxonomy
         </h1>
-        <p className="mx-auto max-w-2xl text-lg leading-relaxed text-stone-500">
+        <p className="mx-auto max-w-2xl text-xl leading-relaxed text-stone-500">
           A two-dimensional framework for classifying educational objectives. It
           combines{" "}
           <span className="font-medium text-stone-700">
@@ -29,7 +29,7 @@ export default function TaxonomyPage() {
 
       {/* Pyramid */}
       <section className="space-y-4">
-        <h2 className="text-center text-sm font-semibold tracking-widest text-stone-400 uppercase">
+        <h2 className="text-center text-sm font-bold tracking-widest text-stone-400 uppercase">
           Cognitive Process Levels
         </h2>
         <div className="mx-auto max-w-lg">
@@ -45,39 +45,37 @@ export default function TaxonomyPage() {
       <section className="grid gap-5 sm:grid-cols-2">
         <Link
           to="/taxonomy/knowledge-dimensions"
-          className="group flex flex-col gap-3 rounded-xl border-2 border-indigo-200 bg-indigo-50 p-6 transition-colors hover:border-indigo-400"
+          className="group flex flex-col gap-4 rounded-2xl border-2 border-indigo-200 bg-indigo-50 p-7 transition-colors hover:border-indigo-400"
         >
-          <span className="flex items-center gap-2 text-indigo-600">
-            <BookOpenCheck size={22} strokeWidth={1.8} aria-hidden />
-            <span className="text-base font-semibold">
-              Knowledge Dimensions
-            </span>
+          <span className="flex items-center gap-3 text-indigo-600">
+            <BookOpenCheck size={24} strokeWidth={1.6} aria-hidden />
+            <span className="text-lg font-bold">Knowledge Dimensions</span>
           </span>
-          <p className="text-sm leading-relaxed text-indigo-700/80">
+          <p className="text-base leading-relaxed text-indigo-700/80">
             The <em>what</em> of learning — factual, conceptual, procedural, and
             metacognitive knowledge types with their subtypes and
             characteristics.
           </p>
-          <span className="mt-auto flex items-center gap-1 text-sm font-medium text-indigo-600 transition-all group-hover:gap-2">
-            Explore dimensions <ArrowRight size={14} aria-hidden />
+          <span className="mt-auto flex items-center gap-1.5 text-sm font-semibold text-indigo-600 transition-all group-hover:gap-2.5">
+            Explore dimensions <ArrowRight size={15} aria-hidden />
           </span>
         </Link>
 
         <Link
           to="/taxonomy/cognitive-levels"
-          className="group flex flex-col gap-3 rounded-xl border-2 border-violet-200 bg-violet-50 p-6 transition-colors hover:border-violet-400"
+          className="group flex flex-col gap-4 rounded-2xl border-2 border-violet-200 bg-violet-50 p-7 transition-colors hover:border-violet-400"
         >
-          <span className="flex items-center gap-2 text-violet-600">
-            <GraduationCap size={22} strokeWidth={1.8} aria-hidden />
-            <span className="text-base font-semibold">Cognitive Levels</span>
+          <span className="flex items-center gap-3 text-violet-600">
+            <GraduationCap size={24} strokeWidth={1.6} aria-hidden />
+            <span className="text-lg font-bold">Cognitive Levels</span>
           </span>
-          <p className="text-sm leading-relaxed text-violet-700/80">
+          <p className="text-base leading-relaxed text-violet-700/80">
             The <em>how</em> of learning — six hierarchical levels of thinking
             from surface retrieval to original production, each with cognitive
             subprocesses.
           </p>
-          <span className="mt-auto flex items-center gap-1 text-sm font-medium text-violet-600 transition-all group-hover:gap-2">
-            Explore levels <ArrowRight size={14} aria-hidden />
+          <span className="mt-auto flex items-center gap-1.5 text-sm font-semibold text-violet-600 transition-all group-hover:gap-2.5">
+            Explore levels <ArrowRight size={15} aria-hidden />
           </span>
         </Link>
       </section>

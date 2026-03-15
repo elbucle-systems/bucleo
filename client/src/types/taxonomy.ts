@@ -50,6 +50,11 @@ export interface KnowledgeSubtypeDetail {
   examples: Record<string, Record<string, string>>
 }
 
+// Response from GET /api/instructional-design/knowledge-dimensions/:dimension/subtypes
+export interface KnowledgeSubtypeFlat extends KnowledgeSubtypeDetail {
+  key: string
+}
+
 // ─── Cognitive Level ──────────────────────────────────────────────────────────
 
 // Response from GET /api/instructional-design/cognitive-levels
@@ -88,6 +93,11 @@ export interface CognitiveProcessDetail {
   assessmentMethods?: string
   expertiseIndicators: string
   examples: Record<string, string | Record<string, string>>
+}
+
+// Response from GET /api/instructional-design/cognitive-levels/:level/subprocesses
+export interface CognitiveProcessFlat extends CognitiveProcessDetail {
+  key: string
 }
 
 // ─── Classification Result ────────────────────────────────────────────────────

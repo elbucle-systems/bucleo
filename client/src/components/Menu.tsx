@@ -15,14 +15,14 @@ function NavItem({
       to={to}
       className={({ isActive }) =>
         [
-          "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
+          "flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors",
           isActive
-            ? "bg-indigo-50 font-medium text-indigo-700"
+            ? "bg-indigo-50 font-semibold text-indigo-700"
             : "text-stone-500 hover:bg-stone-100 hover:text-stone-800",
         ].join(" ")
       }
     >
-      <Icon size={15} strokeWidth={1.8} aria-hidden />
+      <Icon size={16} strokeWidth={1.8} aria-hidden />
       {children}
     </NavLink>
   )
@@ -30,19 +30,19 @@ function NavItem({
 
 export default function Menu() {
   return (
-    <header className="sticky top-0 z-10 border-b border-stone-200 bg-white">
-      <nav className="mx-auto flex h-14 max-w-5xl items-center gap-6 px-4">
+    <header className="sticky top-0 z-10 border-b border-stone-200 bg-white/95 backdrop-blur">
+      <nav className="mx-auto flex h-16 max-w-5xl items-center gap-6 px-6">
         {/* Logo / home */}
         <Link
           to="/"
-          className="mr-4 shrink-0 text-base font-bold tracking-tight text-stone-800"
+          className="mr-4 shrink-0 text-lg font-extrabold tracking-tight text-stone-900"
         >
           Bucleo
         </Link>
 
         {/* Tools group */}
         <div className="flex items-center gap-1">
-          <span className="mr-1 text-xs font-semibold tracking-wider text-stone-300 uppercase">
+          <span className="mr-2 text-xs font-bold tracking-widest text-stone-300 uppercase">
             Tools
           </span>
           <NavItem
@@ -58,7 +58,7 @@ export default function Menu() {
 
         {/* Taxonomy group */}
         <div className="flex items-center gap-1">
-          <span className="mr-1 text-xs font-semibold tracking-wider text-stone-300 uppercase">
+          <span className="mr-2 text-xs font-bold tracking-widest text-stone-300 uppercase">
             Taxonomy
           </span>
           <NavItem to="/taxonomy" icon={BookOpen}>

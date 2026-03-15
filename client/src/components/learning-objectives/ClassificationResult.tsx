@@ -44,49 +44,49 @@ export default function ClassificationResult({ result }: Props) {
 
   return (
     <div className="space-y-5">
-      <h2 className="text-base font-semibold text-stone-700">
+      <h2 className="text-xl font-bold text-stone-800">
         Classification result
       </h2>
 
       {/* Dimension banner */}
       <div
-        className={`rounded-xl border-2 ${colors.banner} flex items-start gap-4 p-5`}
+        className={`rounded-2xl border-2 ${colors.banner} flex items-start gap-5 p-6`}
       >
         <span className={`mt-0.5 shrink-0 ${colors.icon}`}>
-          <Layers size={22} strokeWidth={1.8} aria-hidden />
+          <Layers size={26} strokeWidth={1.6} aria-hidden />
         </span>
-        <div className="space-y-1">
+        <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <span
-              className={`rounded-full px-2 py-0.5 text-xs font-semibold tracking-wider uppercase ${colors.badge}`}
+              className={`rounded-full px-3 py-1 text-xs font-bold tracking-widest uppercase ${colors.badge}`}
             >
               Knowledge Dimension
             </span>
-            <span className="text-base font-bold text-stone-800">
+            <span className="text-xl font-bold text-stone-900">
               {result.dimension.name}
             </span>
           </div>
-          <p className="text-sm leading-relaxed text-stone-600">
+          <p className="text-base leading-relaxed text-stone-600">
             {result.dimension.explanation}
           </p>
         </div>
       </div>
 
       {/* Subtype card */}
-      <div className="flex items-start gap-4 rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
+      <div className="flex items-start gap-5 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <span className="mt-0.5 shrink-0 text-indigo-400">
-          <BookOpen size={20} strokeWidth={1.8} aria-hidden />
+          <BookOpen size={24} strokeWidth={1.6} aria-hidden />
         </span>
-        <div className="space-y-1">
+        <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-stone-100 px-2 py-0.5 text-xs font-semibold tracking-wider text-stone-500 uppercase">
+            <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-bold tracking-widest text-stone-500 uppercase">
               Subtype
             </span>
-            <span className="text-base font-semibold text-stone-800">
+            <span className="text-xl font-bold text-stone-900">
               {result.subtype.name}
             </span>
           </div>
-          <p className="text-sm leading-relaxed text-stone-600">
+          <p className="text-base leading-relaxed text-stone-600">
             {result.subtype.explanation}
           </p>
         </div>
@@ -96,28 +96,28 @@ export default function ClassificationResult({ result }: Props) {
       {result.examples.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-stone-500">
-            <Lightbulb size={15} strokeWidth={1.8} aria-hidden />
-            <span className="text-xs font-semibold tracking-wider uppercase">
+            <Lightbulb size={17} strokeWidth={1.8} aria-hidden />
+            <span className="text-sm font-bold tracking-widest uppercase">
               Classroom examples
             </span>
           </div>
 
-          <ul className="space-y-3">
+          <ul className="space-y-4">
             {result.examples.map((ex, i) => (
               <li
                 key={i}
-                className="space-y-2 rounded-lg border border-stone-200 bg-stone-50 p-4"
+                className="space-y-3 rounded-2xl border border-stone-200 bg-stone-50 p-5"
               >
-                <p className="text-sm font-medium text-stone-700">
+                <p className="text-base font-semibold text-stone-800">
                   {ex.scenario}
                 </p>
                 <div className="flex items-start gap-2 text-stone-500">
                   <ArrowRight
-                    size={14}
+                    size={15}
                     className="mt-0.5 shrink-0"
                     aria-hidden
                   />
-                  <p className="text-sm text-stone-600">
+                  <p className="text-base text-stone-600">
                     {ex.howItAppliesToObjective}
                   </p>
                 </div>
