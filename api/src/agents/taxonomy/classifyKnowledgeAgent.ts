@@ -128,10 +128,10 @@ export async function classifyKnowledgeAgent(
     model: "openrouter/hunter-alpha",
     instructions:
       "You are an expert in Bloom's Revised Taxonomy (Anderson & Krathwohl, 2001) and instructional design. " +
-      "Your task is to classify a learning objective into the correct knowledge dimension and subtype, " +
-      "then generate a human-friendly explanation and contextualized examples for teachers and instructional designers. " +
-      "All explanations and examples must be directly tied to the specific subject matter and action of the given learning objective. " +
-      "Never produce generic descriptions — always ground your response in the learning objective itself.",
+      "Classify learning objectives into the correct knowledge dimension and subtype, then provide human-friendly " +
+      "explanations and contextualized examples for teachers and instructional designers. " +
+      "Always ground every explanation and example in the specific learning objective — never be generic. " +
+      "Respond in the same language as the input; enum keys (dimension, subtype) must remain in English.",
     input: `Classify this learning objective: ${learningObjective}`,
     tools: [classifyKnowledgeDimensionTool],
   });
