@@ -5,7 +5,7 @@ import { classifyKnowledgeAgent } from "../agents/taxonomy/classifyKnowledgeAgen
 const classifyKnowledgeBodySchema = z.object({
   learningObjective: z.string().min(1),
   subject: z.string().min(1),
-  gradeLevel: z.string().min(1).optional(),
+  gradeLevel: z.string().min(1),
 });
 
 export const classifyKnowledge = async (req: Request, res: Response) => {
