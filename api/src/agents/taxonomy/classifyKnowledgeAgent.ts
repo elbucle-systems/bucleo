@@ -1,98 +1,139 @@
-import { OpenRouter, tool, hasToolCall } from "@openrouter/sdk";
+import { OpenRouter, tool } from "@openrouter/sdk";
 import { z } from "zod";
-import type {
-  KnowledgeDimension,
-  KnowledgeSubtypeName,
-  KnowledgeType,
-  KnowledgeSubtype,
-} from "../../taxonomy/types";
-import { factualKnowledge } from "../../taxonomy/knowledgeDimension/factualKnowledge";
-import { conceptualKnowledge } from "../../taxonomy/knowledgeDimension/conceptualKnowledge";
-import { proceduralKnowledge } from "../../taxonomy/knowledgeDimension/proceduralKnowledge";
-import { metacognitiveKnowledge } from "../../taxonomy/knowledgeDimension/metacognitiveKnowledge";
 
-const dimensionMap: Record<KnowledgeDimension, KnowledgeType> = {
-  factual: factualKnowledge,
-  conceptual: conceptualKnowledge,
-  procedural: proceduralKnowledge,
-  metacognitive: metacognitiveKnowledge,
+export type KnowledgeClassificationResult = {
+  dimension: {
+    name: string;
+    explanation: string;
+  };
+  subtype: {
+    name: string;
+    explanation: string;
+  };
+  examples: {
+    scenario: string;
+    howItAppliesToObjective: string;
+  }[];
 };
 
-const subtypeMap: Record<KnowledgeSubtypeName, KnowledgeSubtype> = {
-  ...factualKnowledge.subtypes,
-  ...conceptualKnowledge.subtypes,
-  ...proceduralKnowledge.subtypes,
-  ...metacognitiveKnowledge.subtypes,
-} as Record<KnowledgeSubtypeName, KnowledgeSubtype>;
+const classifyInputSchema = z.object({
+  dimension: z
+    .enum(["factual", "conceptual", "procedural", "metacognitive"])
+    .describe(
+      "The knowledge dimension key used for internal classification: " +
+        "factual (isolated basic elements such as vocabulary, symbols, specific facts), " +
+        "conceptual (organized relationships — categories, principles, theories, models), " +
+        "procedural (subject-specific how-to knowledge — skills, algorithms, techniques, and when to use them), " +
+        "metacognitive (knowledge about cognition itself — learning strategies, task awareness, self-knowledge)",
+    ),
+  subtype: z
+    .enum([
+      "terminology",
+      "specificDetailsAndElements",
+      "classificationsAndCategories",
+      "principlesAndGeneralizations",
+      "theoriesModelsAndStructures",
+      "subjectSpecificSkillsAndAlgorithms",
+      "subjectSpecificTechniquesAndMethods",
+      "criteriaForUsingProcedures",
+      "strategicKnowledge",
+      "cognitiveTasks",
+      "selfKnowledge",
+    ])
+    .describe(
+      "The knowledge subtype key used for internal classification: " +
+        "terminology (labels and symbols that form the basic language of a discipline), " +
+        "specificDetailsAndElements (discrete facts about specific instances, events, people, dates), " +
+        "classificationsAndCategories (categories and systems used to structure or systematize phenomena), " +
+        "principlesAndGeneralizations (abstractions that summarize observations and interrelationships), " +
+        "theoriesModelsAndStructures (integrated sets of principles forming coherent frameworks for explaining phenomena), " +
+        "subjectSpecificSkillsAndAlgorithms (step-by-step discipline-specific sequences and fixed procedures), " +
+        "subjectSpecificTechniquesAndMethods (discipline-specific techniques and methods less fixed than algorithms), " +
+        "criteriaForUsingProcedures (knowledge of when and why to apply subject-specific procedures), " +
+        "strategicKnowledge (general learning and thinking strategies applicable across domains), " +
+        "cognitiveTasks (knowledge of which tasks require which strategies and the conditional when/why), " +
+        "selfKnowledge (awareness of one's own cognitive strengths, weaknesses, and motivational beliefs)",
+    ),
+  dimensionName: z
+    .string()
+    .describe(
+      "Human-readable name of the knowledge dimension, suitable for teachers and instructional designers. " +
+        "E.g. 'Factual Knowledge', 'Conceptual Knowledge', 'Procedural Knowledge', 'Metacognitive Knowledge'.",
+    ),
+  dimensionExplanation: z
+    .string()
+    .describe(
+      "A clear, jargon-free explanation of why this specific learning objective belongs to this knowledge dimension. " +
+        "Write directly for the teacher or instructional designer who wrote the objective. " +
+        "Reference the actual content and action of the learning objective.",
+    ),
+  subtypeName: z
+    .string()
+    .describe(
+      "Human-readable name of the knowledge subtype, suitable for teachers and instructional designers. " +
+        "E.g. 'Terminology', 'Specific Details and Elements', 'Classifications and Categories', etc.",
+    ),
+  subtypeExplanation: z
+    .string()
+    .describe(
+      "A clear, jargon-free explanation of what this subtype means in the specific context of this learning objective. " +
+        "Explain concretely what the student is expected to know or do, referencing the subject matter of the objective.",
+    ),
+  examples: z
+    .array(
+      z.object({
+        scenario: z
+          .string()
+          .describe(
+            "A realistic classroom or real-world situation directly related to the learning objective's subject matter.",
+          ),
+        howItAppliesToObjective: z
+          .string()
+          .describe(
+            "A concrete explanation of how this scenario demonstrates the knowledge type in the context of the learning objective.",
+          ),
+      }),
+    )
+    .describe(
+      "A set of concrete, contextualized examples that illustrate the knowledge dimension and subtype " +
+        "as they apply to this specific learning objective. Each example must be grounded in the subject matter " +
+        "and domain of the learning objective — no generic or abstract examples.",
+    ),
+});
 
 const classifyKnowledgeDimensionTool = tool({
   name: "classify_knowledge_dimension",
   description:
     "Classify a learning objective into its Bloom's Revised Taxonomy knowledge dimension and subtype. " +
+    "Then generate a human-friendly explanation and contextualized examples targeted at teachers and instructional designers. " +
+    "All explanations and examples must be directly tied to the given learning objective — no generic descriptions. " +
     "Dimensions: factual (basic isolated elements of a discipline), conceptual (organized categories, schemas, and theories), " +
     "procedural (subject-specific how-to skills and algorithms), metacognitive (knowledge about cognition and self). " +
     "Subtypes — factual: terminology, specificDetailsAndElements; " +
     "conceptual: classificationsAndCategories, principlesAndGeneralizations, theoriesModelsAndStructures; " +
     "procedural: subjectSpecificSkillsAndAlgorithms, subjectSpecificTechniquesAndMethods, criteriaForUsingProcedures; " +
     "metacognitive: strategicKnowledge, cognitiveTasks, selfKnowledge.",
-  inputSchema: z.object({
-    dimension: z
-      .enum(["factual", "conceptual", "procedural", "metacognitive"])
-      .describe(
-        "The knowledge dimension: " +
-          "factual (isolated basic elements such as vocabulary, symbols, specific facts), " +
-          "conceptual (organized relationships — categories, principles, theories, models), " +
-          "procedural (subject-specific how-to knowledge — skills, algorithms, techniques, and when to use them), " +
-          "metacognitive (knowledge about cognition itself — learning strategies, task awareness, self-knowledge)",
-      ),
-    subtype: z
-      .enum([
-        "terminology",
-        "specificDetailsAndElements",
-        "classificationsAndCategories",
-        "principlesAndGeneralizations",
-        "theoriesModelsAndStructures",
-        "subjectSpecificSkillsAndAlgorithms",
-        "subjectSpecificTechniquesAndMethods",
-        "criteriaForUsingProcedures",
-        "strategicKnowledge",
-        "cognitiveTasks",
-        "selfKnowledge",
-      ])
-      .describe(
-        "The knowledge subtype: " +
-          "terminology (labels and symbols that form the basic language of a discipline), " +
-          "specificDetailsAndElements (discrete facts about specific instances, events, people, dates), " +
-          "classificationsAndCategories (categories and systems used to structure or systematize phenomena), " +
-          "principlesAndGeneralizations (abstractions that summarize observations and interrelationships), " +
-          "theoriesModelsAndStructures (integrated sets of principles forming coherent frameworks for explaining phenomena), " +
-          "subjectSpecificSkillsAndAlgorithms (step-by-step discipline-specific sequences and fixed procedures), " +
-          "subjectSpecificTechniquesAndMethods (discipline-specific techniques and methods less fixed than algorithms), " +
-          "criteriaForUsingProcedures (knowledge of when and why to apply subject-specific procedures), " +
-          "strategicKnowledge (general learning and thinking strategies applicable across domains), " +
-          "cognitiveTasks (knowledge of which tasks require which strategies and the conditional when/why), " +
-          "selfKnowledge (awareness of one's own cognitive strengths, weaknesses, and motivational beliefs)",
-      ),
-  }),
+  inputSchema: classifyInputSchema,
   execute: false,
 });
 
 export async function classifyKnowledgeAgent(
   learningObjective: string,
-): Promise<{ dimension: KnowledgeType; subtype: KnowledgeSubtype }> {
+): Promise<KnowledgeClassificationResult> {
   const openrouter = new OpenRouter({
     apiKey: process.env.OPENROUTER_API_KEY,
   });
 
   const result = openrouter.callModel({
     model: "openrouter/hunter-alpha",
-    input:
-      `You are an expert in Bloom's Revised Taxonomy (Anderson & Krathwohl, 2001). ` +
-      `Classify the following learning objective into the correct knowledge dimension and subtype ` +
-      `by calling the classify_knowledge_dimension tool.\n\n` +
-      `Learning objective: ${learningObjective}`,
+    instructions:
+      "You are an expert in Bloom's Revised Taxonomy (Anderson & Krathwohl, 2001) and instructional design. " +
+      "Your task is to classify a learning objective into the correct knowledge dimension and subtype, " +
+      "then generate a human-friendly explanation and contextualized examples for teachers and instructional designers. " +
+      "All explanations and examples must be directly tied to the specific subject matter and action of the given learning objective. " +
+      "Never produce generic descriptions — always ground your response in the learning objective itself.",
+    input: `Classify this learning objective: ${learningObjective}`,
     tools: [classifyKnowledgeDimensionTool],
-    stopWhen: hasToolCall("classify_knowledge_dimension"),
   });
 
   const toolCalls = await result.getToolCalls();
@@ -104,16 +145,17 @@ export async function classifyKnowledgeAgent(
     );
   }
 
-  const { dimension, subtype } = first.arguments as {
-    dimension: KnowledgeDimension;
-    subtype: KnowledgeSubtypeName;
-  };
+  const args = first.arguments as z.infer<typeof classifyInputSchema>;
 
   return {
     dimension: {
-      ...dimensionMap[dimension],
-      subtypes: { [subtype]: subtypeMap[subtype] },
+      name: args.dimensionName,
+      explanation: args.dimensionExplanation,
     },
-    subtype: subtypeMap[subtype],
+    subtype: {
+      name: args.subtypeName,
+      explanation: args.subtypeExplanation,
+    },
+    examples: args.examples,
   };
 }
