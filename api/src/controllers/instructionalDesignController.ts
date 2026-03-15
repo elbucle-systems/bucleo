@@ -4,6 +4,8 @@ import { classifyKnowledgeAgent } from "../agents/taxonomy/classifyKnowledgeAgen
 
 const classifyKnowledgeBodySchema = z.object({
   learningObjective: z.string().min(1),
+  subject: z.string().min(1),
+  gradeLevel: z.string().min(1).optional(),
 });
 
 export const classifyKnowledge = async (req: Request, res: Response) => {
@@ -15,11 +17,18 @@ export const classifyKnowledge = async (req: Request, res: Response) => {
   }
 
   try {
-    const result = await classifyKnowledgeAgent(parsed.data.learningObjective);
+    const result = await classifyKnowledgeAgent({
+      learningObjective: parsed.data.learningObjective,
+      subject: parsed.data.subject,
+      gradeLevel: parsed.data.gradeLevel,
+    });
     res.json(result);
-  } catch {
-    res
-      .status(500)
-      .json({ error: "Failed to classify the learning objective" });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[classifyKnowledge]", err);
+    res.status(500).json({
+      error: "Failed to classify the learning objective",
+      detail: message,
+    });
   }
 };

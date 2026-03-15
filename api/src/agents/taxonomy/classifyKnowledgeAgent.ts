@@ -117,22 +117,37 @@ const classifyKnowledgeDimensionTool = tool({
   execute: false,
 });
 
-export async function classifyKnowledgeAgent(
-  learningObjective: string,
-): Promise<KnowledgeClassificationResult> {
+export async function classifyKnowledgeAgent({
+  learningObjective,
+  subject,
+  gradeLevel,
+}: {
+  learningObjective: string;
+  subject: string;
+  gradeLevel?: string;
+}): Promise<KnowledgeClassificationResult> {
   const openrouter = new OpenRouter({
     apiKey: process.env.OPENROUTER_API_KEY,
   });
 
+  const gradeLevelClause = gradeLevel ? `at ${gradeLevel} level ` : "";
+
   const result = openrouter.callModel({
-    model: "openrouter/hunter-alpha",
+    models: [
+      "openrouter/hunter-alpha",
+      "nvidia/nemotron-3-super-120b-a12b:free",
+      "arcee-ai/trinity-large-preview:free",
+    ],
     instructions:
       "You are an expert in Bloom's Revised Taxonomy (Anderson & Krathwohl, 2001) and instructional design. " +
       "Classify learning objectives into the correct knowledge dimension and subtype, then provide human-friendly " +
       "explanations and contextualized examples for teachers and instructional designers. " +
-      "Always ground every explanation and example in the specific learning objective — never be generic. " +
+      "Always ground every explanation and example in the specific subject area and grade level provided — never be generic. " +
+      "Examples must reflect realistic situations a student in that subject and level would actually encounter. " +
       "Respond in the same language as the input; enum keys (dimension, subtype) must remain in English.",
-    input: `Classify this learning objective: ${learningObjective}`,
+    input:
+      `Classify this learning objective for a ${subject} course ${gradeLevelClause}:\n` +
+      `Learning objective: ${learningObjective}`,
     tools: [classifyKnowledgeDimensionTool],
   });
 

@@ -1,3 +1,3 @@
 export default function App() {
-  return <div>Bucleo's Frontend is live updated!</div>
+  return <div className="text-red-500">Bucleo's Frontend is live updated!</div>
 }
